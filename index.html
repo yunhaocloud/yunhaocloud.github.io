@@ -221,7 +221,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/10/09/Spring容器/">Spring容器</a>
+            <a class="article-title" href="/2018/10/09/Spring容器/">ajax参数思考</a>
         </h1>
     
 
@@ -231,7 +231,7 @@
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
         <a href="/2018/10/09/Spring容器/">
-            <time datetime="2018-10-09T02:03:32.000Z" itemprop="datePublished">2018-10-09</time>
+            <time datetime="2018-10-09T02:03:00.000Z" itemprop="datePublished">2018-10-09</time>
         </a>
     </div>
 
@@ -245,9 +245,10 @@
         
         <div class="article-entry" itemprop="articleBody">
         
-            
-            <h2 id="Spring容器高级主题"><a href="#Spring容器高级主题" class="headerlink" title="Spring容器高级主题"></a>Spring容器高级主题</h2><p>Spring容器是一部设计精妙的机器，其优异的外在表现是通过精细的内部设计实现的。本章将对Spring容器进行解构<br>，从内部太久Spring容器的体系结构和运行流程。</p>
-
+            <p><p>场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。<br>解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部分源码…<br></p>
+            <p class="article-more-link">
+                <a href="/2018/10/09/Spring容器/#more">查看更多</a>
+            </p>
         
         </div>
         <footer class="article-footer">
@@ -257,7 +258,7 @@
 
 </div>
 
-    <a data-url="http://easysite.com/2018/10/09/Spring容器/" data-id="cjn133v5b0001k8uwr2b3cuv9" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
+    <a data-url="http://easysite.com/2018/10/09/Spring容器/" data-id="cjncji0590003y8uwvl99xe02" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -377,7 +378,7 @@
 
 </div>
 
-    <a data-url="http://easysite.com/2018/10/09/Aop概述/" data-id="cjn133v530000k8uwipwymecq" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
+    <a data-url="http://easysite.com/2018/10/09/Aop概述/" data-id="cjncji0550001y8uwg0enpw63" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -501,7 +502,7 @@
 
 </div>
 
-    <a data-url="http://easysite.com/2018/10/09/hello-world/" data-id="cjn133v5k0003k8uwpziraecn" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
+    <a data-url="http://easysite.com/2018/10/09/hello-world/" data-id="cjncji0580002y8uwl4jhgwrn" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -605,8 +606,8 @@
                         
                         <div class="item-inner">
                             <p class="item-category"></p>
-                            <p class="item-title"><a href="/2018/10/09/Spring容器/" class="title">Spring容器</a></p>
-                            <p class="item-date"><time datetime="2018-10-09T02:03:32.000Z" itemprop="datePublished">2018-10-09</time></p>
+                            <p class="item-title"><a href="/2018/10/09/Spring容器/" class="title">ajax参数思考</a></p>
+                            <p class="item-date"><time datetime="2018-10-09T02:03:00.000Z" itemprop="datePublished">2018-10-09</time></p>
                         </div>
                     </li>
                 

@@ -3,20 +3,22 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Spring容器 | 程序员Easy</title>
+    <title>ajax参数思考 | 程序员Easy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="Spring容器高级主题Spring容器是一部设计精妙的机器，其优异的外在表现是通过精细的内部设计实现的。本章将对Spring容器进行解构，从内部太久Spring容器的体系结构和运行流程。">
+    <meta name="description" content="场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部">
 <meta name="keywords" content="java、架构、js">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring容器">
+<meta property="og:title" content="ajax参数思考">
 <meta property="og:url" content="http://easysite.com/2018/10/09/Spring容器/index.html">
 <meta property="og:site_name" content="程序员Easy">
-<meta property="og:description" content="Spring容器高级主题Spring容器是一部设计精妙的机器，其优异的外在表现是通过精细的内部设计实现的。本章将对Spring容器进行解构，从内部太久Spring容器的体系结构和运行流程。">
+<meta property="og:description" content="场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-09T02:06:59.383Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/yunhaocloud/yunhaocloud.github.io/master/commonimage/2018072318511135.png">
+<meta property="og:updated_time" content="2018-10-17T07:31:22.212Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spring容器">
-<meta name="twitter:description" content="Spring容器高级主题Spring容器是一部设计精妙的机器，其优异的外在表现是通过精细的内部设计实现的。本章将对Spring容器进行解构，从内部太久Spring容器的体系结构和运行流程。">
+<meta name="twitter:title" content="ajax参数思考">
+<meta name="twitter:description" content="场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/yunhaocloud/yunhaocloud.github.io/master/commonimage/2018072318511135.png">
     
 
     
@@ -221,7 +223,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            Spring容器
+            ajax参数思考
         </h1>
     
 
@@ -231,7 +233,7 @@
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
         <a href="/2018/10/09/Spring容器/">
-            <time datetime="2018-10-09T02:03:32.000Z" itemprop="datePublished">2018-10-09</time>
+            <time datetime="2018-10-09T02:03:00.000Z" itemprop="datePublished">2018-10-09</time>
         </a>
     </div>
 
@@ -246,7 +248,13 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h2 id="Spring容器高级主题"><a href="#Spring容器高级主题" class="headerlink" title="Spring容器高级主题"></a>Spring容器高级主题</h2><p>Spring容器是一部设计精妙的机器，其优异的外在表现是通过精细的内部设计实现的。本章将对Spring容器进行解构<br>，从内部太久Spring容器的体系结构和运行流程。</p>
+            <p>场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。<br>解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部分源码…<br><a id="more"></a><br>@RequestBody这个注解的使用需要加载MappingJackson2HttpMessageConverter这个类，然后看了下这个类的源码，有两段注释可以解释这个类的大概功能，如下:</p>
+<blockquote>
+<p>This converter can be used to bind to typed beans, or untyped {@code HashMap} instances.<br>By default, this converter supports {@code application/json} and {@code application/*+json}<br>with {@code UTF-8} character set.</p>
+</blockquote>
+<p>从上面可以看出，它支持 application/json这个类型，而正好415这个错误的描述是：Unsupported Media Type，可以想出，问题出现在请求参数的内容类型上面，再结合jquery的文档的contentType描述：<br><img src="https://raw.githubusercontent.com/yunhaocloud/yunhaocloud.github.io/master/commonimage/2018072318511135.png" alt="haha"></p>
+<p>默认的是application/x-www-form-urlencoded。所以问题的原因是内容类型不正确，手动指定contentType的值为“application/json”,另外需要注意一点，data的值需要是json串，可以用JSON的stringfy方法转换一下，就可以正常接收数据了。</p>
+<p>总结：出问题的时候，可以看一下jquery的各个参数的含义，利用谷歌浏览器的network来查看一些请求的信息。</p>
 
         
         </div>
@@ -257,7 +265,7 @@
 
 </div>
 
-    <a data-url="http://easysite.com/2018/10/09/Spring容器/" data-id="cjn133v5b0001k8uwr2b3cuv9" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
+    <a data-url="http://easysite.com/2018/10/09/Spring容器/" data-id="cjncji0590003y8uwvl99xe02" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -373,8 +381,8 @@
                         
                         <div class="item-inner">
                             <p class="item-category"></p>
-                            <p class="item-title"><a href="/2018/10/09/Spring容器/" class="title">Spring容器</a></p>
-                            <p class="item-date"><time datetime="2018-10-09T02:03:32.000Z" itemprop="datePublished">2018-10-09</time></p>
+                            <p class="item-title"><a href="/2018/10/09/Spring容器/" class="title">ajax参数思考</a></p>
+                            <p class="item-date"><time datetime="2018-10-09T02:03:00.000Z" itemprop="datePublished">2018-10-09</time></p>
                         </div>
                     </li>
                 
