@@ -3,7 +3,11 @@
   <entry>
     <title><![CDATA[ajax参数思考]]></title>
     <url>%2F2018%2F10%2F09%2FSpring%E5%AE%B9%E5%99%A8%2F</url>
-    <content type="text"><![CDATA[场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部分源码…@RequestBody这个注解的使用需要加载MappingJackson2HttpMessageConverter这个类，然后看了下这个类的源码，有两段注释可以解释这个类的大概功能，如下: This converter can be used to bind to typed beans, or untyped {@code HashMap} instances.By default, this converter supports {@code application/json} and {@code application/*+json}with {@code UTF-8} character set. 从上面可以看出，它支持 application/json这个类型，而正好415这个错误的描述是：Unsupported Media Type，可以想出，问题出现在请求参数的内容类型上面，再结合jquery的文档的contentType描述： 默认的是application/x-www-form-urlencoded。所以问题的原因是内容类型不正确，手动指定contentType的值为“application/json”,另外需要注意一点，data的值需要是json串，可以用JSON的stringfy方法转换一下，就可以正常接收数据了。 总结：出问题的时候，可以看一下jquery的各个参数的含义，利用谷歌浏览器的network来查看一些请求的信息。]]></content>
+    <content type="text"><![CDATA[场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部分源码:@RequestBody这个注解的使用需要加载MappingJackson2HttpMessageConverter这个类，然后看了下这个类的源码，有两段注释可以解释这个类的大概功能，如下: This converter can be used to bind to typed beans, or untyped {@code HashMap} instances.By default, this converter supports {@code application/json} and {@code application/*+json}with {@code UTF-8} character set. 从上面可以看出，它支持 application/json这个类型，而正好415这个错误的描述是：Unsupported Media Type，可以想出，问题出现在请求参数的内容类型上面，再结合jquery的文档的contentType描述： 默认的是application/x-www-form-urlencoded。所以问题的原因是内容类型不正确，手动指定contentType的值为“application/json”,另外需要注意一点，data的值需要是json串，可以用JSON的stringfy方法转换一下，就可以正常接收数据了。 总结：出问题的时候，可以看一下jquery的各个参数的含义，利用谷歌浏览器的network来查看一些请求的信息。]]></content>
+      <tags>
+        <tag>ajax</tag>
+        <tag>原创</tag>
+      </tags>
   </entry>
   <entry>
     <title><![CDATA[Aop概述]]></title>
