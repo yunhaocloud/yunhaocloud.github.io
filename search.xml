@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title><![CDATA[ajax参数思考]]></title>
-    <url>%2F2018%2F10%2F09%2FSpring%E5%AE%B9%E5%99%A8%2F</url>
-    <content type="text"><![CDATA[场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部分源码:@RequestBody这个注解的使用需要加载MappingJackson2HttpMessageConverter这个类，然后看了下这个类的源码，有两段注释可以解释这个类的大概功能，如下: This converter can be used to bind to typed beans, or untyped {@code HashMap} instances.By default, this converter supports {@code application/json} and {@code application/*+json}with {@code UTF-8} character set. 从上面可以看出，它支持 application/json这个类型，而正好415这个错误的描述是：Unsupported Media Type，可以想出，问题出现在请求参数的内容类型上面，再结合jquery的文档的contentType描述： 默认的是application/x-www-form-urlencoded。所以问题的原因是内容类型不正确，手动指定contentType的值为“application/json”,另外需要注意一点，data的值需要是json串，可以用JSON的stringfy方法转换一下，就可以正常接收数据了。 总结：出问题的时候，可以看一下jquery的各个参数的含义，利用谷歌浏览器的network来查看一些请求的信息。]]></content>
+    <title><![CDATA[linux环境下svn搭建]]></title>
+    <url>%2F2018%2F10%2F10%2Fsvn%E6%90%AD%E5%BB%BA%2F</url>
+    <content type="text"><![CDATA[鉴于在搭建时，参考网上很多资料，网上资料在有用的同时，也坑了很多人,本文的目的，也就是想让后继之人在搭建svn服务器时不再犯错，不再被网上漫天的坑爹作品所坑害，故此总结.系统环境：Centos 6.5第一步：通过yum命令安装svnserve，命令如下： yum -y install subversion 此命令会全自动安装svn服务器相关服务和依赖，安装完成会自动停止命令运行若需查看svn安装位置，可以用以下命令： rpm -ql subversion 第二步：创建版本库目录（此仅为目录，为后面创建版本库提供存放位置） 选择在var路径下创建版本库，当前处于根目录下，一次性创建如下： mkdir /var/svn/svnrepos 第三步：创建svn版本库 在第二步建立的路径基础上，创建版本库，命令如下： svnadmin create /var/svn/svnrepos/xxxx （xxxx为你预期的版本库名称，可自定义） 创建成功后，进入xxx目录下 cd /var/svn/svnrepos/xxxx 进入目录，可以看见如下文件信息： 第四步：配置修改 进入已经创建好的版本库目录下，也就是前文说创建的xxxx 进入conf cd /var/svn/svnrepos/xxxx/conf conf目录下，一共存放三份重要的配置文件，如下： authz：负责账号权限的管理，控制账号是否读写权限 passwd：负责账号和密码的用户名单管理 svnserve.conf：svn服务器配置文件 细节修改如下：（希望大家严格按照以下信息，不用参考网络上其他资料） 修改authz文件信息，如下： vi authz 在文件内容的末尾，添加如下： 只需在末尾添加，无需在文件其他部分修改和添加任何东西（请忽略groups被我马赛克的地方，那其实也是条无用的记录，我忘记删掉而已），末尾内容如下： [] 账号1 = rw 账号2 = rw 。。。。。 rw表示赋予此账号可读写的权限，请注意[]中的斜杠，一定是反斜杠，有些教程说，需添加版本库名称在括号内，我直接建议就这写，这样写允许访问的权限更大，避免一些错误 修改passwd文件信息 vi passwd 账号密码文件无需做修改，也是直接将账号和密码信息追加到文件中即可，注意格式为： 账号 = 密码 例如：admin = 123456 修改svnserve.conf（重要） vi svnserve.conf 原始文件内容，都被注释掉的，我们只需要去掉4条指定内容前注释即可，如下： 大多数网络资料，都会让大家将authz-db = authz这条给去掉注释，经过我本人多次被坑经验，此条去掉后，虽然svn服务器可以连接，但一直会提示“认证失败”，注释掉即可正常 还有多数资料会让大家在realm = My First Repository处填写服务器ip，经过测试，填写后并无什么用处，所以大家去掉注释即可，无需做任何修改 到此，配置已经全部完成，账号信息已经添加成功 第五步：防火墙开启 多数情况下服务器安装完成，配置完成后，无法连接svn服务器，均是防火墙问题，大家按照如下3条命令逐一执行即可 /sbin/iptables -I INPUT -p tcp –dport 3690 -j ACCEPT /etc/init.d/iptables save service iptables restart 执行结果如下图： 六：启动svn服务器 在跟目录下，执行如下命令： svnserve -d -r /var/svn/svnrepos 启动成功后，可用ps -aux查看服务启动是否成功 七：客户端访问svn服务器 在windows客户端，输入地址：svn://ip地址:3690/xxxx （iP地址为你linux的ip，xxxx为前文创建的版本库名称,3690为svn默认端口） 弹出输入用户名和密码，输入即可访问 到此，Linux下svn服务器搭建就总结完毕，感谢大家的阅读 如果此文有帮助到你，请帮忙推广 （原创，转载请注明来源，翻版必究） 转载自：https://www.cnblogs.com/mymelon/p/5483215.html]]></content>
+      <categories>
+        <category>后端</category>
+        <category>转载</category>
+      </categories>
       <tags>
-        <tag>ajax</tag>
-        <tag>原创</tag>
+        <tag>linux</tag>
+        <tag>svn</tag>
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[Aop概述]]></title>
-    <url>%2F2018%2F10%2F09%2FAop%E6%A6%82%E8%BF%B0%2F</url>
-    <content type="text"><![CDATA[编程语言的最终极目标就是能以更自然的、更灵活的方式模拟世界，从原始机器语言到过程语言再到面向对象的语言。hahahhahahhaha]]></content>
+    <title><![CDATA[ajax参数思考]]></title>
+    <url>%2F2018%2F10%2F09%2Fajax%E4%BC%A0%E5%8F%82%2F</url>
+    <content type="text"><![CDATA[场景：前端ajax请求后台，没有声明contentType的值，data是一个json对象。后台用@RequestBody注解的bean去接收，前端会报出415的错误。解决方案：把@RequestBody注解去掉，就可以正常接收参数了，页面传的参数是用&amp;拼接的，然后spring对应的conventer转换成对应的bean属性的值:如果用这个注解的话，也可以的，看了一些网上和spring的部分源码:@RequestBody这个注解的使用需要加载MappingJackson2HttpMessageConverter这个类，然后看了下这个类的源码，有两段注释可以解释这个类的大概功能，如下: This converter can be used to bind to typed beans, or untyped {@code HashMap} instances.By default, this converter supports {@code application/json} and {@code application/*+json}with {@code UTF-8} character set. 从上面可以看出，它支持 application/json这个类型，而正好415这个错误的描述是：Unsupported Media Type，可以想出，问题出现在请求参数的内容类型上面，再结合jquery的文档的contentType描述： 默认的是application/x-www-form-urlencoded。所以问题的原因是内容类型不正确，手动指定contentType的值为“application/json”,另外需要注意一点，data的值需要是json串，可以用JSON的stringfy方法转换一下，就可以正常接收数据了。 总结：出问题的时候，可以看一下jquery的各个参数的含义，利用谷歌浏览器的network来查看一些请求的信息。]]></content>
+      <categories>
+        <category>前端</category>
+        <category>原创</category>
+      </categories>
+      <tags>
+        <tag>ajax</tag>
+      </tags>
   </entry>
   <entry>
-    <title><![CDATA[Hello World]]></title>
-    <url>%2F2018%2F10%2F09%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
-  </entry>
-  <entry>
-    <title><![CDATA[分布式]]></title>
-    <url>%2F2018%2F10%2F09%2FMy-New-Post%2F</url>
-    <content type="text"><![CDATA[分布式服务跟踪通过之前各章节介绍的Spring Cloud组件，实际上我们已经能够通过使用他们搭建起一个基础的微服务架构系统来实现业务需求了。但是，随着业务的发展，系统规模也会变得越来越大，各微服务间的调用关系也变得越来越错综复杂。]]></content>
+    <title><![CDATA[Html对象参数传递]]></title>
+    <url>%2F2018%2F10%2F09%2Fhtml%E5%AF%B9%E8%B1%A1%E5%8F%82%E6%95%B0%E4%BC%A0%E9%80%92%2F</url>
+    <content type="text"><![CDATA[场景：html里面的onClick函数，在传递参数的时候，如果是简单的字符串，是没问题的；而如果传的是一个对象的时候，大部分都是JSON对象或则数组对象，这个时候会出现一些问题。针对JSON：如果直接传递的话，然后在方法里面获取的时候，会报undefined原因分析：在JavaScript里，在接受到JSON对象的时候，会自动转换成对于的js对象；而在html里面，对象的传递必须进行处理，转换成json串来传递，然后直接就可以在对应的js方法里面取值了，不用再转换成JSON对象了。有时候可能还需要将JSON串的双引号转换成单引号来解决一些语法上的错误。 解决方案: JSON对象调用stringfy方法转换成JSON串 把JOSN对象的每一个属性值分别传递给对象的function 通过DataTable获取对应的Row对象，然后再获取对象的值 JSON定义： JSON(JavaScript Object Notation, JS 对象简谱) 是一种轻量级的数据交换格式。它基于 ECMAScript(欧洲计算机协会制定的js规范)的一个子集，采用完全独立于编程语言的文本格式来存储和表示数据。简洁和清晰的层次结构使得 JSON 成为理想的数据交换语言。 易于人阅读和编写，同时也易于机器解析和生成，并有效地提升网络传输效率。 JSON语法: 对象表示为键值对 数据由逗号分隔 花括号保存对象 方括号保存数组 JSON键值对： JSON 键值对是用来保存 JS 对象的一种方式，和 JS 对象的写法也大同小异，键/值对组合中的键名写在前面并用双引号 “” 包裹，使用冒号 : 分隔，然后紧接着值： 1：{“firstName”: “Json”} 这很容易理解，等价于这条 JavaScript 语句： 1：{firstName : “Json”} JSON和JS的关系： &gt; 很多人搞不清楚 JSON 和 Js 对象的关系，甚至连谁是谁都不清楚。其实，可以这么理解： JSON 是 JS 对象的字符串表示法，它使用文本表示一个 JS 对象的信息，本质是一个字符串。 如： 1：var obj = {a: ‘Hello’, b: ‘World’}; //这是一个对象，注意键名也是可以使用引号包裹的 1：var json = ‘{“a”: “Hello”, “b”: “World”}’; //这是一个 JSON 字符串，本质是一个字符串 JSON和JS对象互转： 要实现从对象转换为 JSON 字符串，使用 JSON.stringify() 方法： 1：var json = JSON.stringify({a: ‘Hello’, b: ‘World’}); //结果是 ‘{“a”: “Hello”, “b”: “World”}’ 要实现从 JSON 转换为对象，使用 JSON.parse() 方法： 1：var obj = JSON.parse(‘{“a”: “Hello”, “b”: “World”}’); //结果是 {a: ‘Hello’, b: ‘World’} 总结：要多利用JSON对象的方法去尝试打印一些日志信息，熟悉JSON的语法格式和JS对象的关系。]]></content>
+      <categories>
+        <category>前端</category>
+        <category>原创</category>
+      </categories>
+      <tags>
+        <tag>html</tag>
+        <tag>参数传递</tag>
+      </tags>
   </entry>
   <entry>
     <title><![CDATA[事务小记]]></title>
-    <url>%2F2018%2F10%2F09%2F%E4%BA%8B%E5%8A%A1%E5%B0%8F%E8%AE%B0%2F</url>
+    <url>%2F2018%2F10%2F09%2Fkafka%E6%80%9D%E8%80%83%E4%B9%8B%E4%B8%80%2F</url>
     <content type="text"><![CDATA[数据库事务基础知识Spring虽然提供了灵活方便的事务管理功能，但这些功能都是基于底层数据库本身的事务处理机制工作的。要深入了解Spring的事务管理和配置，有必要先对数据库事务的基础知识进行学习。 何为数据库事务“一荣俱荣，一损俱损”，这句话很能体现事务的思想，很多复杂的事务要分布进行，但他们组成一个整体，要么整体生效，要么整体失效。这种思想反映到数据上，就是多个SQL语句，要么所有执行成功，要么所有执行失败。*数据库事务有严格的定义，它必须同时满足4个特性：原子性（Atomic）、一致性（Consistency）、隔离性（Isolation）和持久性（Durabiliy），简称为ACID。下面是对每个特性的说明。 原子性：表示组成一个事务的多个数据库操作是一个不可分割的原子单元，只有所有的操作执行成功，整个事务才提交。 一致性：事务操作成功后，数据库所处的状态和他的业务规则是一致的。 隔离性：在并发数据操作时，不同的事务拥有各自的数据空间，他们的操作不会对对方产生干扰。 持久性：一旦事务提交成功后，事务中所有的数据操作都必须被持久化到数据库中。]]></content>
   </entry>
 </search>
